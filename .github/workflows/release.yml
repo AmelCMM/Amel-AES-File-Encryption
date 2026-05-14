@@ -48,9 +48,20 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build executable
+      - name: Build executable (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --onefile --windowed --name amel_encryptor amel_encryptor.py
+          pyinstaller --onefile --windowed --name amel_encryptor --exclude-module matplotlib --exclude-module numpy --exclude-module tkinter --exclude-module unittest --exclude-module email --exclude-module http --exclude-module xml --exclude-module pydoc amel_encryptor.py
+
+      - name: Build executable (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          xvfb-run pyinstaller --onefile --windowed --name amel_encryptor --exclude-module matplotlib --exclude-module numpy --exclude-module tkinter --exclude-module unittest --exclude-module email --exclude-module http --exclude-module xml --exclude-module pydoc amel_encryptor.py
+
+      - name: Build executable (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          pyinstaller --onefile --windowed --name amel_encryptor --exclude-module matplotlib --exclude-module numpy --exclude-module tkinter --exclude-module unittest --exclude-module email --exclude-module http --exclude-module xml --exclude-module pydoc amel_encryptor.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
