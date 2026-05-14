@@ -1,7 +1,7 @@
+# 🛡 Amel AES File Encryptor
+
 ![Build](https://github.com/NeuraLumina/Amel-AES-File-Encryption/actions/workflows/build.yml/badge.svg)
 ![Release](https://github.com/NeuraLumina/Amel-AES-File-Encryption/actions/workflows/release.yml/badge.svg)
-
-# 🛡 Amel AES File Encryptor
 
 A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any file with a password — the original filename is preserved inside the encrypted blob with zero plaintext metadata leakage.
 
