@@ -1,6 +1,6 @@
 # 🛡 Amel AES File Encryptor
 
-A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any file with a password and decrypt it later — the original filename is preserved inside the encrypted blob.
+A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any file with a password — the original filename is preserved inside the encrypted blob with zero plaintext metadata leakage.
 
 ---
 
@@ -8,10 +8,10 @@ A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any fil
 
 - **AES-256-GCM** authenticated encryption (tamper-evident)
 - **PBKDF2-SHA256** key derivation (100 000 iterations, random salt per file)
+- **Zero metadata leakage** — filename and file type are encrypted alongside the data
 - **Drag-and-drop** or file picker support
 - **Non-blocking UI** — encryption/decryption runs on a background thread
 - **Safe overwrite handling** — never silently replaces existing files
-- **Filename preservation** — original name is stored inside the `.amel` file
 - **Password visibility toggle**
 - Minimum password length enforcement (8 characters)
 
@@ -22,8 +22,6 @@ A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any fil
 - Python 3.10+
 - PyQt6
 - cryptography
-
-Install dependencies:
 
 ```bash
 pip install PyQt6 cryptography
@@ -55,18 +53,20 @@ python amel_encryptor.py
 
 ---
 
-## File Format
+## File Format (v2)
 
-The `.amel` format is a single binary blob with the following layout:
+The `.amel` format is a single binary blob:
 
 ```
-┌─────────────┬───────────────┬────────────────────┬──────────────────────┬─────────────────────────┐
-│  Salt       │  Nonce        │  Name length        │  Original filename   │  AES-GCM ciphertext     │
-│  16 bytes   │  12 bytes     │  2 bytes (big-end)  │  variable            │  variable + 16-byte tag │
-└─────────────┴───────────────┴────────────────────┴──────────────────────┴─────────────────────────┘
+┌─────────────────┬─────────────┬───────────┬──────────────────────────────────────────────────────┐
+│  Version        │  Salt       │  Nonce    │  AES-GCM ciphertext                                  │
+│  1 byte (0x02)  │  16 bytes   │  12 bytes │  [ name_len 2B ][ filename ][ file data ][ GCM tag ] │
+└─────────────────┴─────────────┴───────────┴──────────────────────────────────────────────────────┘
 ```
 
-The 16-byte GCM authentication tag is appended to the ciphertext by the `cryptography` library automatically. Decryption will raise an exception if the password is wrong or the file has been tampered with.
+Everything after the 29-byte header is ciphertext. The filename, file type, and file contents are all encrypted together as a single plaintext blob — nothing outside the ciphertext reveals anything about the original file.
+
+The 16-byte GCM authentication tag is appended automatically by the `cryptography` library. Decryption raises an exception immediately if the password is wrong or the file has been tampered with.
 
 ---
 
@@ -79,30 +79,31 @@ The 16-byte GCM authentication tag is appended to the ciphertext by the `cryptog
 | Salt | 16 bytes, `os.urandom` per file |
 | Nonce | 12 bytes, `os.urandom` per encryption |
 | Authentication | GCM tag verifies integrity on decrypt |
+| Metadata leakage | None — filename and type are encrypted |
+| Observable at OS level | File size only |
 | Minimum password | 8 characters (enforced in UI) |
 
-- **Losing your password means losing the file.** There is no recovery mechanism.
-- The tool provides **no protection against side-channel attacks** on the host machine — it is designed for file-at-rest encryption, not adversarial environments.
-- For very large files (several GB), PBKDF2 key derivation may take a second or two before progress is visible — this is normal.
+- **Losing your password means losing the file permanently.** There is no recovery mechanism — this is a feature, not a bug.
+- The tool provides **no protection against side-channel attacks** on the host machine. It is designed for file-at-rest encryption, not adversarial environments.
+- For very large files, PBKDF2 key derivation may take a moment before progress is visible — this is expected behaviour.
 
 ---
 
-## Changes from v1
+## Changelog
 
-| # | Fix |
-|---|-----|
-| 1 | Progress bar now resets to 0 before every operation |
-| 2 | File path stored in `self.file_path`, not parsed from label text |
-| 3 | Output files are auto-renamed if destination already exists |
-| 4 | Crypto runs on a `QThread` — UI never freezes |
-| 5 | Status label shows "Encrypting…" / "Decrypting…" during operation |
-| 6 | Buttons disabled during operation, re-enabled on completion |
-| 7 | Removed deprecated `default_backend()` from PBKDF2HMAC call |
-| 8 | Replaced surrogate-pair emoji with literal `🛡` character |
-| 9 | Minimum password length of 8 characters enforced with clear warning |
+### v2 (current)
+- Filename and file type are now encrypted inside the ciphertext — zero plaintext metadata in the header
+- Added `FORMAT_VERSION` byte (`0x02`) for forward compatibility
+- Decrypt rejects files encrypted with an unsupported version rather than producing garbage output
+- Removed all inline comments — code is self-explanatory
+
+### v1
+- Initial release
+- AES-256-GCM encryption with PBKDF2-SHA256 key derivation
+- PyQt6 GUI with drag-and-drop support and background thread crypto
 
 ---
 
 ## License
 
-MIT — use freely, modify freely, attribute appreciated.
+MIT — use freely, modify freely, attribution appreciated.
