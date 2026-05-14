@@ -81,7 +81,7 @@ class CryptoWorker(QThread):
             f.write(FORMAT_VERSION + salt + nonce + ciphertext)
 
         self.progress.emit(100)
-        self.success.emit(f"Encrypted → {output_path}")
+        self.success.emit(f"Encrypted -> {output_path}")
 
     def _decrypt(self):
         self.progress.emit(10)
@@ -135,7 +135,7 @@ class AmelEncryptor(QWidget):
         self.worker:    CryptoWorker | None = None
 
         self.setAcceptDrops(True)
-        self.setWindowTitle("Amel AES File Encryptor")
+        self.setWindowTitle("Amel AES File Encryptor V2")
         self.resize(500, 580)
 
         palette = self.palette()
