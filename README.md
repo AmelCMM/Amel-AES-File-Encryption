@@ -1,9 +1,21 @@
 # 🛡 Amel AES File Encryptor
 
-![Build](https://github.com/NeuraLumina/Amel-AES-File-Encryption/actions/workflows/build.yml/badge.svg)
-![Release](https://github.com/NeuraLumina/Amel-AES-File-Encryption/actions/workflows/release.yml/badge.svg)
+![Build](https://github.com/AmelCMM/Amel-AES-File-Encryption/actions/workflows/build.yml/badge.svg)
+![Release](https://github.com/AmelCMM/Amel-AES-File-Encryption/actions/workflows/release.yml/badge.svg)
 
 A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any file with a password — the original filename is preserved inside the encrypted blob with zero plaintext metadata leakage.
+
+---
+
+## ⬇️ Download
+
+| Platform | Link |
+|---|---|
+| 🪟 Windows | [amel_encryptor.exe](https://github.com/AmelCMM/Amel-AES-File-Encryption/releases/latest/download/amel_encryptor-windows.exe) |
+| 🐧 Linux | [amel_encryptor](https://github.com/AmelCMM/Amel-AES-File-Encryption/releases/latest/download/amel_encryptor-linux) |
+| 🍎 macOS | [amel_encryptor](https://github.com/AmelCMM/Amel-AES-File-Encryption/releases/latest/download/amel_encryptor-macos) |
+
+> These links always point to the latest release. No Python installation required.
 
 ---
 
@@ -21,6 +33,8 @@ A desktop file encryption tool built with PyQt6 and AES-256-GCM. Encrypt any fil
 ---
 
 ## Requirements
+
+> Only needed if running from source. Skip this if you downloaded a binary above.
 
 - Python 3.10+
 - PyQt6
